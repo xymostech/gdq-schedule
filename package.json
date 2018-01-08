@@ -1,0 +1,35 @@
+{
+  "name": "webpackbin-project",
+  "version": "1.0.0",
+  "description": "Project boilerplate",
+  "scripts": {
+    "build": "NODE_ENV=production webpack",
+    "publish": "npm run build && now --static",
+    "start": "webpack-dev-server --content-base build/ --port 5050"
+  },
+  "dependencies": {
+    "aphrodite": "1.2.5",
+    "moment": "^2.20.1",
+    "normalize.css": "7.0.0",
+    "react": "16.2.0",
+    "react-dom": "16.2.0",
+    "react-popover": "0.5.4"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.2.10",
+    "babel-plugin-transform-class-properties": "^6.23.0",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-react": "^6.5.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "css-loader": "^0.23.1",
+    "html-webpack-plugin": "2.22.0",
+    "style-loader": "^0.13.0",
+    "uglifyjs-webpack-plugin": "^1.1.6",
+    "webpack": "^2.2.0",
+    "webpack-dev-server": "2.3.0"
+  },
+  "author": "WebpackBin",
+  "license": "ISC"
+}
