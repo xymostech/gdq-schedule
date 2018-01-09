@@ -1,0 +1,11 @@
+{
+  "name": "gdq-schedule",
+  "alias": "gdq-schedule.com",
+  "files": [
+    "index.html",
+    "build/main.js",
+    "README.md",
+    "LICENSE.txt"
+  ],
+  "type": "static"
+}
