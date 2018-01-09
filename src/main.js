@@ -267,7 +267,10 @@ class App extends React.Component {
       <h1>
         AGDQ Schedule
       </h1>
+      <p><a href="https://gamesdonequick.com/tracker/donate/22">Donate to The Prevent Cancer Foundation&reg;</a></p>
+      <p><a href="https://www.twitch.tv/gamesdonequick">Watch AGDQ on Twitch.tv</a></p>
       {chart}
+      <p>Contribute at <a href="https://github.com/xymostech/gdq-schedule">xymostech/gdq-schedule on github</a></p>
     </div>;
   }
 }
