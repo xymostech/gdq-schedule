@@ -4,6 +4,7 @@
   "files": [
     "index.html",
     "build/main.js",
+    "data/schedule.json",
     "README.md",
     "LICENSE.txt"
   ],

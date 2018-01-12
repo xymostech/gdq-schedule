@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "Project boilerplate",
   "scripts": {
+    "fetch-data": "node tools/fetch-data.js",
     "build": "NODE_ENV=production webpack",
-    "publish": "npm run build && now",
-    "start": "webpack-dev-server --content-base build/ --port 5050"
+    "publish": "npm run fetch-data && npm run build && now",
+    "start": "npm run fetch-data && webpack-dev-server --content-base build/ --port 5050"
   },
   "dependencies": {
     "aphrodite": "1.2.5",
@@ -25,6 +26,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "css-loader": "^0.23.1",
     "html-webpack-plugin": "2.22.0",
+    "jsdom": "^11.5.1",
     "style-loader": "^0.13.0",
     "uglifyjs-webpack-plugin": "^1.1.6",
     "webpack": "^2.2.0",

@@ -5,21 +5,9 @@ import moment from "moment";
 import Popover from "react-popover";
 import "normalize.css";
 
-import data from "./data.js";
-
-// time, name, runners, duration, setupLength, runKind, platform, host
-
 function parseTime(time) {
     return moment.utc(time).local();
 }
-
-data.forEach(function(d) {
-    d.time = parseTime(d.time);
-    d.duration = moment.duration(d.duration);
-    d.setupLength = d.setupLength
-        ? moment.duration(d.setupLength)
-        : moment.duration(0);
-});
 
 function msToMinutes(ms) {
     return ms / 1000 / 60;
@@ -36,79 +24,93 @@ function startOfNextDay(date) {
     return startOfDay(date).add(1, "day");
 }
 
-const eventStart = moment.utc("2018-01-07T16:30:00Z").local();
-const eventDayStart = startOfDay(eventStart);
+function parseDataToDays(data) {
+    // time, name, runners, duration, setupLength, runKind, platform, host
 
-const days = [{day: eventDayStart, runs: []}];
+    data.forEach(function(d) {
+        d.time = parseTime(d.time);
+        d.duration = moment.duration(d.duration);
+        d.setupLength = d.setupLength
+            ? moment.duration(d.setupLength)
+            : moment.duration(0);
+    });
 
-days[0].runs.push({
-    type: "spacer",
-    duration: msToMinutes(eventStart.diff(eventDayStart)),
-});
+    const eventStart = moment.utc("2018-01-07T16:30:00Z").local();
+    const eventDayStart = startOfDay(eventStart);
 
-data.forEach(function(d) {
-    const setupTime = d.time.clone().subtract(d.setupLength);
-    const runEndTime = d.time.clone().add(d.duration);
+    const days = [{day: eventDayStart, runs: []}];
 
-    const setupDate = setupTime.date() - eventDayStart.date();
-    const runStartDate = d.time.date() - eventDayStart.date();
-    const runEndDate = runEndTime.date() - eventDayStart.date();
+    days[0].runs.push({
+        type: "spacer",
+        duration: msToMinutes(eventStart.diff(eventDayStart)),
+    });
 
-    while (days.length <= runEndDate) {
-        days.push({day: startOfDay(runEndTime), runs: []});
-    }
-    if (setupTime.isSame(d.time, "day")) {
-        days[setupDate].runs.push({
-            type: "setup",
-            duration: msToMinutes(d.setupLength.asMilliseconds()),
-        });
-    } else {
-        const runDayStart = startOfDay(d.time);
-        days[setupDate].runs.push({
-            type: "setup",
-            runsOver: true,
-            duration: msToMinutes(runDayStart.diff(setupTime)),
-            info: d,
-        });
-        days[runStartDate].runs.push({
-            type: "setup",
-            runOver: true,
-            duration: msToMinutes(d.time.diff(runDayStart)),
-            info: d,
-        });
-    }
-    if (d.time.isSame(runEndTime, "day")) {
-        days[runStartDate].runs.push({
-            type: "run",
-            duration: msToMinutes(d.duration.asMilliseconds()),
-            info: d,
-        });
-    } else {
-        const runEndDayStart = startOfDay(runEndTime);
-        days[runStartDate].runs.push({
-            type: "run",
-            runsOver: true,
-            duration: msToMinutes(runEndDayStart.diff(d.time)),
-            info: d,
-        });
-        days[runEndDate].runs.push({
-            type: "run",
-            runOver: true,
-            duration: msToMinutes(runEndTime.diff(runEndDayStart)),
-            info: d,
-        });
-    }
-});
+    data.forEach(function(d) {
+        const setupTime = d.time.clone().subtract(d.setupLength);
+        const runEndTime = d.time.clone().add(d.duration);
 
-const lastData = data[data.length - 1];
-const lastEndTime = lastData.time.clone().add(lastData.duration);
-const lastEndDate = lastEndTime.date() - eventDayStart.date();
-const lastEndNextDay = startOfNextDay(lastEndTime);
+        const setupDate = setupTime.date() - eventDayStart.date();
+        const runStartDate = d.time.date() - eventDayStart.date();
+        const runEndDate = runEndTime.date() - eventDayStart.date();
 
-days[lastEndDate].runs.push({
-    type: "spacer",
-    duration: msToMinutes(lastEndNextDay.diff(lastEndTime)),
-});
+        while (days.length <= runEndDate) {
+            days.push({day: startOfDay(runEndTime), runs: []});
+        }
+        if (setupTime.isSame(d.time, "day")) {
+            days[setupDate].runs.push({
+                type: "setup",
+                duration: msToMinutes(d.setupLength.asMilliseconds()),
+            });
+        } else {
+            const runDayStart = startOfDay(d.time);
+            days[setupDate].runs.push({
+                type: "setup",
+                runsOver: true,
+                duration: msToMinutes(runDayStart.diff(setupTime)),
+                info: d,
+            });
+            days[runStartDate].runs.push({
+                type: "setup",
+                runOver: true,
+                duration: msToMinutes(d.time.diff(runDayStart)),
+                info: d,
+            });
+        }
+        if (d.time.isSame(runEndTime, "day")) {
+            days[runStartDate].runs.push({
+                type: "run",
+                duration: msToMinutes(d.duration.asMilliseconds()),
+                info: d,
+            });
+        } else {
+            const runEndDayStart = startOfDay(runEndTime);
+            days[runStartDate].runs.push({
+                type: "run",
+                runsOver: true,
+                duration: msToMinutes(runEndDayStart.diff(d.time)),
+                info: d,
+            });
+            days[runEndDate].runs.push({
+                type: "run",
+                runOver: true,
+                duration: msToMinutes(runEndTime.diff(runEndDayStart)),
+                info: d,
+            });
+        }
+    });
+
+    const lastData = data[data.length - 1];
+    const lastEndTime = lastData.time.clone().add(lastData.duration);
+    const lastEndDate = lastEndTime.date() - eventDayStart.date();
+    const lastEndNextDay = startOfNextDay(lastEndTime);
+
+    days[lastEndDate].runs.push({
+        type: "spacer",
+        duration: msToMinutes(lastEndNextDay.diff(lastEndTime)),
+    });
+
+    return days;
+}
 
 function formatDuration(duration) {
     let result = "";
@@ -212,6 +214,7 @@ function range(n) {
 class App extends React.Component {
     state = {
         now: moment(),
+        days: null,
     };
 
     componentDidMount() {
@@ -220,6 +223,21 @@ class App extends React.Component {
                 now: moment(),
             });
         }, 1000 * 15);
+
+        fetch("/data/schedule.json")
+            .then(resp => {
+                if (resp.status >= 200 && resp.status < 300) {
+                    return resp;
+                } else {
+                    throw new Error(resp.statusText);
+                }
+            })
+            .then(resp => resp.json())
+            .then(data =>
+                this.setState({
+                    days: parseDataToDays(data),
+                }),
+            );
     }
 
     componentWillUnmount() {
@@ -239,59 +257,62 @@ class App extends React.Component {
                         </div>
                     ))}
                 </div>
-                {this.props.days.map((day, i) => (
-                    <div key={i} className={css(styles.day)}>
-                        {this.state.now.isSame(day.day, "day") && (
-                            <div
-                                key="curr-indicator"
-                                className={css(
-                                    styles.currentTimeIndicatorWrapper,
-                                )}
-                            >
+                {this.state.days &&
+                    this.state.days.map((day, i) => (
+                        <div key={i} className={css(styles.day)}>
+                            {this.state.now.isSame(day.day, "day") && (
                                 <div
-                                    style={{
-                                        flex: msToMinutes(
-                                            this.state.now.diff(
-                                                startOfDay(this.state.now),
-                                            ),
-                                        ),
-                                    }}
-                                />
-                                <div
-                                    className={css(styles.currentTimeIndicator)}
-                                />
-                                <div
-                                    style={{
-                                        flex: msToMinutes(
-                                            startOfNextDay(this.state.now).diff(
-                                                this.state.now,
-                                            ),
-                                        ),
-                                    }}
-                                />
-                            </div>
-                        )}
-                        <div className={css(styles.dayLabel)}>
-                            {day.day.format("ddd, MMM Do")}
-                        </div>
-                        {day.runs.map(
-                            (run, j) =>
-                                run.type === "run" ? (
-                                    <Run run={run} now={this.state.now} />
-                                ) : (
+                                    key="curr-indicator"
+                                    className={css(
+                                        styles.currentTimeIndicatorWrapper,
+                                    )}
+                                >
                                     <div
                                         style={{
-                                            flex: run.duration,
+                                            flex: msToMinutes(
+                                                this.state.now.diff(
+                                                    startOfDay(this.state.now),
+                                                ),
+                                            ),
                                         }}
+                                    />
+                                    <div
                                         className={css(
-                                            run.type === "setup" &&
-                                                styles.setup,
+                                            styles.currentTimeIndicator,
                                         )}
                                     />
-                                ),
-                        )}
-                    </div>
-                ))}
+                                    <div
+                                        style={{
+                                            flex: msToMinutes(
+                                                startOfNextDay(
+                                                    this.state.now,
+                                                ).diff(this.state.now),
+                                            ),
+                                        }}
+                                    />
+                                </div>
+                            )}
+                            <div className={css(styles.dayLabel)}>
+                                {day.day.format("ddd, MMM Do")}
+                            </div>
+                            {day.runs.map(
+                                (run, j) =>
+                                    run.type === "run" ? (
+                                        <Run run={run} now={this.state.now} />
+                                    ) : (
+                                        <div
+                                            style={{
+                                                flex: run.duration,
+                                            }}
+                                            className={css(
+                                                run.type === "setup" &&
+                                                    styles.setup,
+                                            )}
+                                        />
+                                    ),
+                            )}
+                        </div>
+                    ))}
             </div>
         );
 
@@ -426,4 +447,4 @@ const styles = StyleSheet.create({
     },
 });
 
-ReactDOM.render(<App days={days} />, document.getElementById("main"));
+ReactDOM.render(<App />, document.getElementById("main"));
