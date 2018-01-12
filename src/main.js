@@ -13,12 +13,12 @@ function parseTime(time) {
     return moment.utc(time).local();
 }
 
-let lastTime = null;
-let currDay = 0;
 data.forEach(function(d) {
     d.time = parseTime(d.time);
     d.duration = moment.duration(d.duration);
-    d.setupLength = d.setupLength ? moment.duration(d.setupLength) : moment.duration(0);
+    d.setupLength = d.setupLength
+        ? moment.duration(d.setupLength)
+        : moment.duration(0);
 });
 
 function msToMinutes(ms) {
@@ -26,7 +26,11 @@ function msToMinutes(ms) {
 }
 
 function startOfDay(date) {
-    return date.clone().hour(0).minute(0).second(0);
+    return date
+        .clone()
+        .hour(0)
+        .minute(0)
+        .second(0);
 }
 function startOfNextDay(date) {
     return startOfDay(date).add(1, "day");
@@ -35,7 +39,7 @@ function startOfNextDay(date) {
 const eventStart = moment.utc("2018-01-07T16:30:00Z").local();
 const eventDayStart = startOfDay(eventStart);
 
-const days = [{ day: eventDayStart, runs: [] }];
+const days = [{day: eventDayStart, runs: []}];
 
 days[0].runs.push({
     type: "spacer",
@@ -51,7 +55,7 @@ data.forEach(function(d) {
     const runEndDate = runEndTime.date() - eventDayStart.date();
 
     while (days.length <= runEndDate) {
-        days.push({ day: startOfDay(runEndTime), runs: [] });
+        days.push({day: startOfDay(runEndTime), runs: []});
     }
     if (setupTime.isSame(d.time, "day")) {
         days[setupDate].runs.push({
@@ -107,280 +111,319 @@ days[lastEndDate].runs.push({
 });
 
 function formatDuration(duration) {
-  let result = "";
+    let result = "";
 
-  const hours = duration.hours();
-  const minutes = duration.minutes();
+    const hours = duration.hours();
+    const minutes = duration.minutes();
 
-  if (hours > 0) {
-    result += `${hours} ${hours === 1 ? "hour" : "hours"} `;
-  }
-  if (minutes > 0) {
-    result += `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
-  }
-  return result;
+    if (hours > 0) {
+        result += `${hours} ${hours === 1 ? "hour" : "hours"} `;
+    }
+    if (minutes > 0) {
+        result += `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+    }
+    return result;
 }
 
 class Run extends React.Component {
-  state = {
-    open: false,
-  };
+    state = {
+        open: false,
+    };
 
-  handleClickIn = (e) => {
-    e.preventDefault();
+    handleClickIn = e => {
+        e.preventDefault();
 
-    this.setState({
-      open: !this.state.open,
-    });
-  }
+        this.setState({
+            open: !this.state.open,
+        });
+    };
 
-  handleClickOut = () => {
-    this.setState({
-      open: false,
-    });
-  }
+    handleClickOut = () => {
+        this.setState({
+            open: false,
+        });
+    };
 
-  render() {
-    const run = this.props.run;
-    const info = run.info;
+    render() {
+        const run = this.props.run;
+        const info = run.info;
 
-    const isSetup = /SETUP BLOCK/.test(info.name);
-    const isDone = info.time.clone().add(info.duration).isBefore(this.props.now);
+        const isSetup = /SETUP BLOCK/.test(info.name);
+        const isDone = info.time
+            .clone()
+            .add(info.duration)
+            .isBefore(this.props.now);
 
-    const popover = (
-      <div
-        className={css(styles.popover)}
-      >
-        <div>{info.name}{!isSetup && <span> ({info.platform})</span>}</div>
-        {!isSetup && <div>Runner(s): {info.runners}</div>}
-        {!isSetup && <div>{info.runKind}</div>}
-        <div>Host: {info.host}</div>
-        <div>
-          {info.time.format("h:mm a")} &ndash; {info.time.clone().add(info.duration).format("h:mm a")}
-          {" "}({formatDuration(info.duration)})
-        </div>
-      </div>
-    );
+        const popover = (
+            <div className={css(styles.popover)}>
+                <div>
+                    {info.name}
+                    {!isSetup && <span> ({info.platform})</span>}
+                </div>
+                {!isSetup && <div>Runner(s): {info.runners}</div>}
+                {!isSetup && <div>{info.runKind}</div>}
+                <div>Host: {info.host}</div>
+                <div>
+                    {info.time.format("h:mm a")} &ndash;{" "}
+                    {info.time
+                        .clone()
+                        .add(info.duration)
+                        .format("h:mm a")}{" "}
+                    ({formatDuration(info.duration)})
+                </div>
+            </div>
+        );
 
-    return (
-      <Popover
-        isOpen={this.state.open}
-        body={popover}
-        onOuterAction={this.handleClickOut}
-        enterExitTransitionDurationMs={100}
-      >
-        <div
-          style={{
-            flex: this.props.run.duration,
-          }}
-          className={css(
-            styles.run,
-            isSetup && styles.setupBlock,
-            isDone && styles.done,
-            this.props.run.runsOver && styles.runsOver,
-            this.props.run.runOver && styles.runOver,
-          )}
-          onClick={this.handleClickIn}
-        >
-          {info.name}
-        </div>
-      </Popover>
-    );
-  }
+        return (
+            <Popover
+                isOpen={this.state.open}
+                body={popover}
+                onOuterAction={this.handleClickOut}
+                enterExitTransitionDurationMs={100}
+            >
+                <div
+                    style={{
+                        flex: this.props.run.duration,
+                    }}
+                    className={css(
+                        styles.run,
+                        isSetup && styles.setupBlock,
+                        isDone && styles.done,
+                        this.props.run.runsOver && styles.runsOver,
+                        this.props.run.runOver && styles.runOver,
+                    )}
+                    onClick={this.handleClickIn}
+                >
+                    {info.name}
+                </div>
+            </Popover>
+        );
+    }
 }
 
 function range(n) {
-  const arr = [];
-  for (let i = 0; i < n; i++) {
-    arr.push(i);
-  }
-  return arr;
+    const arr = [];
+    for (let i = 0; i < n; i++) {
+        arr.push(i);
+    }
+    return arr;
 }
 
 class App extends React.Component {
-  state = {
-    now: moment(),
-  };
-
-  componentDidMount() {
-    this._refreshTimer = setInterval(() => {
-      this.setState({
+    state = {
         now: moment(),
-      });
-    }, 1000 * 15);
-  }
+    };
 
-  componentWillUnmount() {
-    clearInterval(this._refreshTimer);
-  }
+    componentDidMount() {
+        this._refreshTimer = setInterval(() => {
+            this.setState({
+                now: moment(),
+            });
+        }, 1000 * 15);
+    }
 
-  render() {
-    const chart = <div className={css(styles.chart)}>
-      <div className={css(styles.hourLabels)}>
-        <div className={css(styles.dayLabel)} />
-        {range(24 / 3).map(x => (
-          <div className={css(styles.hourLabel)}>
-            {moment({hour: x*3, minute: 0, second: 0}).format("h:mm a")}
-          </div>
-        ))}
-      </div>
-      {this.props.days.map((day, i) => (
-        <div key={i} className={css(styles.day)}>
-          {this.state.now.isSame(day.day, "day") && (
-            <div
-              key="curr-indicator"
-              className={css(styles.currentTimeIndicatorWrapper)}
-            >
-              <div
-                style={{
-                  flex: msToMinutes(this.state.now.diff(startOfDay(this.state.now))),
-                }}
-              />
-              <div className={css(styles.currentTimeIndicator)} />
-              <div
-                style={{
-                  flex: msToMinutes(startOfNextDay(this.state.now).diff(this.state.now)),
-                }}
-              />
+    componentWillUnmount() {
+        clearInterval(this._refreshTimer);
+    }
+
+    render() {
+        const chart = (
+            <div className={css(styles.chart)}>
+                <div className={css(styles.hourLabels)}>
+                    <div className={css(styles.dayLabel)} />
+                    {range(24 / 3).map(x => (
+                        <div className={css(styles.hourLabel)}>
+                            {moment({hour: x * 3, minute: 0, second: 0}).format(
+                                "h:mm a",
+                            )}
+                        </div>
+                    ))}
+                </div>
+                {this.props.days.map((day, i) => (
+                    <div key={i} className={css(styles.day)}>
+                        {this.state.now.isSame(day.day, "day") && (
+                            <div
+                                key="curr-indicator"
+                                className={css(
+                                    styles.currentTimeIndicatorWrapper,
+                                )}
+                            >
+                                <div
+                                    style={{
+                                        flex: msToMinutes(
+                                            this.state.now.diff(
+                                                startOfDay(this.state.now),
+                                            ),
+                                        ),
+                                    }}
+                                />
+                                <div
+                                    className={css(styles.currentTimeIndicator)}
+                                />
+                                <div
+                                    style={{
+                                        flex: msToMinutes(
+                                            startOfNextDay(this.state.now).diff(
+                                                this.state.now,
+                                            ),
+                                        ),
+                                    }}
+                                />
+                            </div>
+                        )}
+                        <div className={css(styles.dayLabel)}>
+                            {day.day.format("ddd, MMM Do")}
+                        </div>
+                        {day.runs.map(
+                            (run, j) =>
+                                run.type === "run" ? (
+                                    <Run run={run} now={this.state.now} />
+                                ) : (
+                                    <div
+                                        style={{
+                                            flex: run.duration,
+                                        }}
+                                        className={css(
+                                            run.type === "setup" &&
+                                                styles.setup,
+                                        )}
+                                    />
+                                ),
+                        )}
+                    </div>
+                ))}
             </div>
-          )}
-          <div className={css(styles.dayLabel)}>
-            {day.day.format("ddd, MMM Do")}
-          </div>
-          {day.runs.map((run, j) => (
-            run.type === "run"
-              ? <Run run={run} now={this.state.now} />
-              : <div
-                  style={{
-                    flex: run.duration,
-                  }}
-                  className={css(
-                    run.type === "setup" && styles.setup,
-                  )}
-                />
-          ))}
-        </div>
-      ))}
-    </div>;
+        );
 
-    return <div className={css(styles.app)}>
-      <h1>
-        AGDQ Schedule
-      </h1>
-      <p><a href="https://gamesdonequick.com/tracker/donate/22">Donate to The Prevent Cancer Foundation&reg;</a></p>
-      <p><a href="https://www.twitch.tv/gamesdonequick">Watch AGDQ on Twitch.tv</a></p>
-      {chart}
-      <p>Contribute at <a href="https://github.com/xymostech/gdq-schedule">xymostech/gdq-schedule on github</a></p>
-    </div>;
-  }
+        return (
+            <div className={css(styles.app)}>
+                <h1>AGDQ Schedule</h1>
+                <p>
+                    <a href="https://gamesdonequick.com/tracker/donate/22">
+                        Donate to The Prevent Cancer Foundation&reg;
+                    </a>
+                </p>
+                <p>
+                    <a href="https://www.twitch.tv/gamesdonequick">
+                        Watch AGDQ on Twitch.tv
+                    </a>
+                </p>
+                {chart}
+                <p>
+                    Contribute at{" "}
+                    <a href="https://github.com/xymostech/gdq-schedule">
+                        xymostech/gdq-schedule on github
+                    </a>
+                </p>
+            </div>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
-  app: {
-    margin: "0 auto",
-    padding: 10,
-    boxSizing: "border-box",
-    maxWidth: 1200,
-    width: "100%",
-    textAlign: "center",
-  },
+    app: {
+        margin: "0 auto",
+        padding: 10,
+        boxSizing: "border-box",
+        maxWidth: 1200,
+        width: "100%",
+        textAlign: "center",
+    },
 
-  chart: {
-    height: "90vh",
-    width: "100%",
+    chart: {
+        height: "90vh",
+        width: "100%",
 
-    display: "flex",
-    flexDirection: "row",
-    fontFamily: "sans-serif",
-  },
+        display: "flex",
+        flexDirection: "row",
+        fontFamily: "sans-serif",
+    },
 
-  day: {
-    marginLeft: 5,
-    display: "flex",
-    flexDirection: "column",
-    flex: 1,
-    alignItems: "center",
-    position: "relative",
-  },
+    day: {
+        marginLeft: 5,
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        alignItems: "center",
+        position: "relative",
+    },
 
-  currentTimeIndicatorWrapper: {
-    position: "absolute",
-    top: 20,
-    bottom: 0,
-    left: -2,
-    right: -2,
-    display: "flex",
-    flexDirection: "column",
-    pointerEvents: "none",
-  },
+    currentTimeIndicatorWrapper: {
+        position: "absolute",
+        top: 20,
+        bottom: 0,
+        left: -2,
+        right: -2,
+        display: "flex",
+        flexDirection: "column",
+        pointerEvents: "none",
+    },
 
-  currentTimeIndicator: {
-    width: "100%",
-    height: 1,
-    backgroundColor: "#000",
-  },
+    currentTimeIndicator: {
+        width: "100%",
+        height: 1,
+        backgroundColor: "#000",
+    },
 
-  dayLabel: {
-    flex: "0 0 20px",
-    fontFamily: "sans-serif",
-    fontSize: 17,
-    paddingBottom: 5,
-    whiteSpace: "nowrap",
-  },
+    dayLabel: {
+        flex: "0 0 20px",
+        fontFamily: "sans-serif",
+        fontSize: 17,
+        paddingBottom: 5,
+        whiteSpace: "nowrap",
+    },
 
-  hourLabels: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-  },
+    hourLabels: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+    },
 
-  hourLabel: {
-    flex: 1,
-    width: "100%",
-    textAlign: "left",
-    boxSizing: "border-box",
-    borderTop: "1px solid black",
-    whiteSpace: "nowrap",
-    paddingRight: 10,
-  },
+    hourLabel: {
+        flex: 1,
+        width: "100%",
+        textAlign: "left",
+        boxSizing: "border-box",
+        borderTop: "1px solid black",
+        whiteSpace: "nowrap",
+        paddingRight: 10,
+    },
 
-  run: {
-    backgroundColor: "#00aeef",
-    width: "100%",
-    boxSizing: "border-box",
-    border: "1px solid #555",
-    overflow: "hidden",
-    cursor: "pointer",
-  },
+    run: {
+        backgroundColor: "#00aeef",
+        width: "100%",
+        boxSizing: "border-box",
+        border: "1px solid #555",
+        overflow: "hidden",
+        cursor: "pointer",
+    },
 
-  done: {
-    opacity: 0.7,
-  },
+    done: {
+        opacity: 0.7,
+    },
 
-  runOver: {
-    borderTop: 0,
-  },
+    runOver: {
+        borderTop: 0,
+    },
 
-  runsOver: {
-    borderBottom: 0,
-  },
+    runsOver: {
+        borderBottom: 0,
+    },
 
-  setup: {
-    width: "100%",
-  },
+    setup: {
+        width: "100%",
+    },
 
-  setupBlock: {
-    backgroundColor: "#f21847",
-  },
+    setupBlock: {
+        backgroundColor: "#f21847",
+    },
 
-  popover: {
-    backgroundColor: "#ccc",
-    borderRadius: 3,
-    boxShadow: "1px 1px 2px #999",
-    padding: 10,
-  },
+    popover: {
+        backgroundColor: "#ccc",
+        borderRadius: 3,
+        boxShadow: "1px 1px 2px #999",
+        padding: 10,
+    },
 });
 
-ReactDOM.render(
-  <App days={days} />,
-  document.getElementById("main"));
+ReactDOM.render(<App days={days} />, document.getElementById("main"));
