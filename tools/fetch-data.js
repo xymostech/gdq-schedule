@@ -21,7 +21,7 @@ https.get("https://gamesdonequick.com/schedule", res => {
         const trs = Array.from(
             document
                 .querySelector("#runTable")
-                .querySelectorAll("tr:not(.day-split)"),
+                .querySelectorAll("tr:not(.day-split)")
         ).slice(0, -1);
         let runs = [];
         for (let i = 0; i < trs.length; i += 2) {
