@@ -112,6 +112,7 @@ function parseDataToDays(data) {
     return days;
 }
 
+// Function that returns how long an event takes.
 function formatDuration(duration) {
     let result = "";
 
@@ -145,7 +146,6 @@ class Run extends React.Component {
             open: false,
         });
     };
-
     render() {
         const run = this.props.run;
         const info = run.info;
@@ -166,12 +166,8 @@ class Run extends React.Component {
                 {!isSetup && <div>{info.runKind}</div>}
                 <div>Host: {info.host}</div>
                 <div>
-                    {info.time.format("h:mm a")} &ndash;{" "}
-                    {info.time
-                        .clone()
-                        .add(info.duration)
-                        .format("h:mm a")}{" "}
-                    ({formatDuration(info.duration)})
+                    Duration:{" "}
+                    {formatDuration(info.duration)}
                 </div>
             </div>
         );
@@ -196,7 +192,16 @@ class Run extends React.Component {
                     )}
                     onClick={this.handleClickIn}
                 >
+                    <div className={css(styles.eventTimes)}>
+                        {info.time.format("h:mm a")} &ndash;{" "}
+                        {info.time
+                          .clone()
+                          .add(info.duration)
+                          .format("h:mm a")}{"\n"}
+                    </div>
+                    <strong>
                     {info.name}
+                    </strong>
                 </div>
             </Popover>
         );
@@ -247,16 +252,6 @@ class App extends React.Component {
     render() {
         const chart = (
             <div className={css(styles.chart)}>
-                <div className={css(styles.hourLabels)}>
-                    <div className={css(styles.dayLabel)} />
-                    {range(24 / 3).map(x => (
-                        <div className={css(styles.hourLabel)}>
-                            {moment({hour: x * 3, minute: 0, second: 0}).format(
-                                "h:mm a",
-                            )}
-                        </div>
-                    ))}
-                </div>
                 {this.state.days &&
                     this.state.days.map((day, i) => (
                         <div key={i} className={css(styles.day)}>
@@ -300,15 +295,7 @@ class App extends React.Component {
                                     run.type === "run" ? (
                                         <Run run={run} now={this.state.now} />
                                     ) : (
-                                        <div
-                                            style={{
-                                                flex: run.duration,
-                                            }}
-                                            className={css(
-                                                run.type === "setup" &&
-                                                    styles.setup,
-                                            )}
-                                        />
+                                        <div/>
                                     ),
                             )}
                         </div>
@@ -318,24 +305,25 @@ class App extends React.Component {
 
         return (
             <div className={css(styles.app)}>
-                <h1>AGDQ Schedule</h1>
-                <p>
-                    <a href="https://gamesdonequick.com/tracker/donate/22">
-                        Donate to The Prevent Cancer Foundation&reg;
-                    </a>
-                </p>
-                <p>
-                    <a href="https://www.twitch.tv/gamesdonequick">
-                        Watch AGDQ on Twitch.tv
-                    </a>
-                </p>
+                <header className={css(styles.header)}>
+                    <h1>AGDQ Schedule</h1>
+                    <nav className={css(styles.headNavs)}>
+                        <a href="https://gamesdonequick.com/tracker/donate/22">
+                            Donate
+                        </a>
+                    </nav>
+                    <nav className={css(styles.headNavs)}>
+                        <a href="https://www.twitch.tv/gamesdonequick">
+                            Watch
+                        </a>
+                    </nav>
+                    <nav className={css(styles.headNavs)}>
+                        <a href="https://github.com/xymostech/gdq-schedule">
+                            Github
+                        </a>
+                    </nav>
+                </header>
                 {chart}
-                <p>
-                    Contribute at{" "}
-                    <a href="https://github.com/xymostech/gdq-schedule">
-                        xymostech/gdq-schedule on github
-                    </a>
-                </p>
             </div>
         );
     }
@@ -344,28 +332,41 @@ class App extends React.Component {
 const styles = StyleSheet.create({
     app: {
         margin: "0 auto",
-        padding: 10,
+        paddingBottom: 10,
         boxSizing: "border-box",
-        maxWidth: 1200,
+        maxWidth: 1300,
         width: "100%",
-        textAlign: "center",
+        fontFamily: "sans-serif"
+    },
+
+    header: {
+        display: "flex",
+        padding: "0px 0px 0px 15px",
+        margin: "-8px 0px 40px 0px",
+        borderBottom: "1px solid #c1c1c1",
+        height: 70,
+    },
+
+    headNavs: {
+        padding: "30px 0px 0px 2%",
+        /* Gets the child <a> */
+        ':active, a': {
+            textDecoration: "none",
+            color: "black",
+        }
     },
 
     chart: {
-        height: "90vh",
         width: "100%",
-
         display: "flex",
         flexDirection: "row",
-        fontFamily: "sans-serif",
     },
 
     day: {
-        marginLeft: 5,
+        marginLeft: 2,
         display: "flex",
         flexDirection: "column",
-        flex: 1,
-        alignItems: "center",
+        flexBasis: "12.5%",
         position: "relative",
     },
 
@@ -387,11 +388,13 @@ const styles = StyleSheet.create({
     },
 
     dayLabel: {
-        flex: "0 0 20px",
+        backgroundColor: "#333333",
+        color: "#FFFFFF",
         fontFamily: "sans-serif",
         fontSize: 17,
-        paddingBottom: 5,
+        padding: 5,
         whiteSpace: "nowrap",
+        textAlign: "left"
     },
 
     hourLabels: {
@@ -411,12 +414,24 @@ const styles = StyleSheet.create({
     },
 
     run: {
-        backgroundColor: "#00aeef",
         width: "100%",
         boxSizing: "border-box",
-        border: "1px solid #555",
-        overflow: "hidden",
+        overflow: "scroll",
         cursor: "pointer",
+        padding: 5,
+        margin: "1px 0px",
+        textAlign: "left",
+        minHeight: 85,
+        /* This doesn't work like it should, lol */
+        /*
+        ":nth-child(even)": {
+            backgroundColor: "#00aeef"
+        },
+        ":nth-child(odd)": {
+            backgroundColor: "#f21847"
+        },
+        */
+        backgroundColor: "#00aeef",
     },
 
     done: {
@@ -440,11 +455,20 @@ const styles = StyleSheet.create({
     },
 
     popover: {
-        backgroundColor: "#ccc",
+        backgroundColor: "#fff",
+        border: "2px solid #00aeef",
         borderRadius: 3,
-        boxShadow: "1px 1px 2px #999",
+        boxShadow: "1px 1px 2px #b3b3b3",
         padding: 10,
+        fontSize: 15,
+        opacity: 0.95,
+        fontFamily: "sans-serif",
     },
+
+    eventTimes: {
+        fontSize: 14,
+        paddingBottom: 5,
+    }
 });
 
 ReactDOM.render(<App />, document.getElementById("main"));
