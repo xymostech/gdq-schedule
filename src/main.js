@@ -248,7 +248,6 @@ class App extends React.Component {
     componentWillUnmount() {
         clearInterval(this._refreshTimer);
     }
-
     render() {
         const chart = (
             <div className={css(styles.chart)}>
@@ -374,17 +373,18 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: 20,
         bottom: 0,
-        left: -2,
-        right: -2,
+        right: 0,
         display: "flex",
         flexDirection: "column",
         pointerEvents: "none",
     },
 
     currentTimeIndicator: {
-        width: "100%",
-        height: 1,
-        backgroundColor: "#000",
+        width: 0,
+        height: 0,
+        borderTop: "10px solid transparent",
+        borderBottom: "10px solid transparent",
+        borderRight: "10px solid black",
     },
 
     dayLabel: {
@@ -395,22 +395,6 @@ const styles = StyleSheet.create({
         padding: 5,
         whiteSpace: "nowrap",
         textAlign: "left"
-    },
-
-    hourLabels: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-end",
-    },
-
-    hourLabel: {
-        flex: 1,
-        width: "100%",
-        textAlign: "left",
-        boxSizing: "border-box",
-        borderTop: "1px solid black",
-        whiteSpace: "nowrap",
-        paddingRight: 10,
     },
 
     run: {
