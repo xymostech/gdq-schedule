@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#00aeef",
         width: "100%",
         boxSizing: "border-box",
-        overflow: "scroll",
+        overflow: "hidden",
         cursor: "pointer",
         padding: 5,
     },
