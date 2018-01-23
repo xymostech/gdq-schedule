@@ -243,20 +243,9 @@ class App extends React.Component {
     componentWillUnmount() {
         clearInterval(this._refreshTimer);
     }
-
     render() {
         const chart = (
             <div className={css(styles.chart)}>
-                <div className={css(styles.hourLabels)}>
-                    <div className={css(styles.dayLabel)} />
-                    {range(24 / 3).map(x => (
-                        <div className={css(styles.hourLabel)}>
-                            {moment({hour: x * 3, minute: 0, second: 0}).format(
-                                "h:mm a",
-                            )}
-                        </div>
-                    ))}
-                </div>
                 {this.state.days &&
                     this.state.days.map((day, i) => (
                         <div key={i} className={css(styles.day)}>
@@ -317,26 +306,27 @@ class App extends React.Component {
         );
 
         return (
-            <div className={css(styles.app)}>
-                <h1>AGDQ Schedule</h1>
-                <p>
-                    <a href="https://gamesdonequick.com/tracker/donate/22">
-                        Donate to The Prevent Cancer Foundation&reg;
-                    </a>
-                </p>
-                <p>
-                    <a href="https://www.twitch.tv/gamesdonequick">
-                        Watch AGDQ on Twitch.tv
-                    </a>
-                </p>
-                {chart}
-                <p>
-                    Contribute at{" "}
-                    <a href="https://github.com/xymostech/gdq-schedule">
-                        xymostech/gdq-schedule on github
-                    </a>
-                </p>
-            </div>
+          <div className={css(styles.app)}>
+              <header className={css(styles.header)}>
+                  <h1>AGDQ Schedule</h1>
+                  <nav className={css(styles.headNavs)}>
+                      <a className={css(styles.headNavsLinks)} href="https://gamesdonequick.com/tracker/donate/22">
+                          Donate
+                      </a>
+                  </nav>
+                  <nav className={css(styles.headNavs)}>
+                      <a className={css(styles.headNavsLinks)} href="https://www.twitch.tv/gamesdonequick">
+                          Watch
+                      </a>
+                  </nav>
+                  <nav className={css(styles.headNavs)}>
+                      <a className={css(styles.headNavsLinks)} href="https://github.com/xymostech/gdq-schedule">
+                          Github
+                      </a>
+                  </nav>
+              </header>
+              {chart}
+          </div>
         );
     }
 }
@@ -344,28 +334,41 @@ class App extends React.Component {
 const styles = StyleSheet.create({
     app: {
         margin: "0 auto",
-        padding: 10,
+        paddingBottom: 10,
         boxSizing: "border-box",
-        maxWidth: 1200,
+        maxWidth: 1300,
         width: "100%",
-        textAlign: "center",
-    },
-
-    chart: {
-        height: "90vh",
-        width: "100%",
-
-        display: "flex",
-        flexDirection: "row",
         fontFamily: "sans-serif",
     },
 
+    header: {
+        display: "flex",
+        padding: "0px 0px 0px 15px",
+        margin: "-8px 0px 40px 0px",
+        borderBottom: "1px solid #c1c1c1",
+        height: 70,
+    },
+
+    headNavs: {
+        padding: "30px 0px 0px 2%",
+    },
+
+    headNavsLinks: {
+        textDecoration: "none",
+        color: "black",
+    },
+
+    chart: {
+        width: "100%",
+        display: "flex",
+        flexDirection: "row",
+    },
+
     day: {
-        marginLeft: 5,
+        marginLeft: 2,
         display: "flex",
         flexDirection: "column",
-        flex: 1,
-        alignItems: "center",
+        flexBasis: "12.5%",
         position: "relative",
     },
 
@@ -373,50 +376,39 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: 20,
         bottom: 0,
-        left: -2,
-        right: -2,
+        right: 0,
         display: "flex",
         flexDirection: "column",
         pointerEvents: "none",
     },
 
     currentTimeIndicator: {
-        width: "100%",
-        height: 1,
-        backgroundColor: "#000",
+        width: 0,
+        height: 0,
+        borderTop: "10px solid transparent",
+        borderBottom: "10px solid transparent",
+        borderRight: "10px solid black",
+        zIndex: 1
     },
 
     dayLabel: {
-        flex: "0 0 20px",
+        backgroundColor: "#333333",
+        color: "#FFFFFF",
         fontFamily: "sans-serif",
         fontSize: 17,
-        paddingBottom: 5,
+        padding: 5,
         whiteSpace: "nowrap",
-    },
-
-    hourLabels: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-end",
-    },
-
-    hourLabel: {
-        flex: 1,
-        width: "100%",
+        flex: "0 0 20px",
         textAlign: "left",
-        boxSizing: "border-box",
-        borderTop: "1px solid black",
-        whiteSpace: "nowrap",
-        paddingRight: 10,
     },
 
     run: {
         backgroundColor: "#00aeef",
         width: "100%",
         boxSizing: "border-box",
-        border: "1px solid #555",
-        overflow: "hidden",
+        overflow: "scroll",
         cursor: "pointer",
+        padding: 5,
     },
 
     done: {
@@ -440,11 +432,20 @@ const styles = StyleSheet.create({
     },
 
     popover: {
-        backgroundColor: "#ccc",
+        backgroundColor: "#fff",
+        border: "2px solid #00aeef",
         borderRadius: 3,
-        boxShadow: "1px 1px 2px #999",
+        boxShadow: "1px 1px 2px #b3b3b3",
         padding: 10,
+        fontSize: 15,
+        opacity: 0.95,
+        fontFamily: "sans-serif",
     },
+
+    eventTimes: {
+        fontSize: 14,
+        paddingBottom: 5,
+    }
 });
 
 ReactDOM.render(<App />, document.getElementById("main"));
