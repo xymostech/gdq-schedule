@@ -112,7 +112,6 @@ function parseDataToDays(data) {
     return days;
 }
 
-// Function that returns how long an event takes.
 function formatDuration(duration) {
     let result = "";
 
@@ -146,6 +145,7 @@ class Run extends React.Component {
             open: false,
         });
     };
+
     render() {
         const run = this.props.run;
         const info = run.info;
@@ -166,8 +166,12 @@ class Run extends React.Component {
                 {!isSetup && <div>{info.runKind}</div>}
                 <div>Host: {info.host}</div>
                 <div>
-                    Duration:{" "}
-                    {formatDuration(info.duration)}
+                    {info.time.format("h:mm a")} &ndash;{" "}
+                    {info.time
+                        .clone()
+                        .add(info.duration)
+                        .format("h:mm a")}{" "}
+                    ({formatDuration(info.duration)})
                 </div>
             </div>
         );
@@ -192,16 +196,7 @@ class Run extends React.Component {
                     )}
                     onClick={this.handleClickIn}
                 >
-                    <div className={css(styles.eventTimes)}>
-                        {info.time.format("h:mm a")} &ndash;{" "}
-                        {info.time
-                          .clone()
-                          .add(info.duration)
-                          .format("h:mm a")}{"\n"}
-                    </div>
-                    <strong>
                     {info.name}
-                    </strong>
                 </div>
             </Popover>
         );
@@ -294,7 +289,15 @@ class App extends React.Component {
                                     run.type === "run" ? (
                                         <Run run={run} now={this.state.now} />
                                     ) : (
-                                        <div/>
+                                        <div
+                                            style={{
+                                                flex: run.duration,
+                                            }}
+                                            className={css(
+                                                run.type === "setup" &&
+                                                    styles.setup,
+                                            )}
+                                        />
                                     ),
                             )}
                         </div>
@@ -303,27 +306,27 @@ class App extends React.Component {
         );
 
         return (
-            <div className={css(styles.app)}>
-                <header className={css(styles.header)}>
-                    <h1>AGDQ Schedule</h1>
-                    <nav className={css(styles.headNavs)}>
-                        <a href="https://gamesdonequick.com/tracker/donate/22">
-                            Donate
-                        </a>
-                    </nav>
-                    <nav className={css(styles.headNavs)}>
-                        <a href="https://www.twitch.tv/gamesdonequick">
-                            Watch
-                        </a>
-                    </nav>
-                    <nav className={css(styles.headNavs)}>
-                        <a href="https://github.com/xymostech/gdq-schedule">
-                            Github
-                        </a>
-                    </nav>
-                </header>
-                {chart}
-            </div>
+          <div className={css(styles.app)}>
+              <header className={css(styles.header)}>
+                  <h1>AGDQ Schedule</h1>
+                  <nav className={css(styles.headNavs)}>
+                      <a className={css(styles.headNavsLinks)} href="https://gamesdonequick.com/tracker/donate/22">
+                          Donate
+                      </a>
+                  </nav>
+                  <nav className={css(styles.headNavs)}>
+                      <a className={css(styles.headNavsLinks)} href="https://www.twitch.tv/gamesdonequick">
+                          Watch
+                      </a>
+                  </nav>
+                  <nav className={css(styles.headNavs)}>
+                      <a className={css(styles.headNavsLinks)} href="https://github.com/xymostech/gdq-schedule">
+                          Github
+                      </a>
+                  </nav>
+              </header>
+              {chart}
+          </div>
         );
     }
 }
@@ -335,7 +338,7 @@ const styles = StyleSheet.create({
         boxSizing: "border-box",
         maxWidth: 1300,
         width: "100%",
-        fontFamily: "sans-serif"
+        fontFamily: "sans-serif",
     },
 
     header: {
@@ -348,11 +351,11 @@ const styles = StyleSheet.create({
 
     headNavs: {
         padding: "30px 0px 0px 2%",
-        /* Gets the child <a> */
-        ':active, a': {
-            textDecoration: "none",
-            color: "black",
-        }
+    },
+
+    headNavsLinks: {
+        textDecoration: "none",
+        color: "black",
     },
 
     chart: {
@@ -385,6 +388,7 @@ const styles = StyleSheet.create({
         borderTop: "10px solid transparent",
         borderBottom: "10px solid transparent",
         borderRight: "10px solid black",
+        zIndex: 1
     },
 
     dayLabel: {
@@ -394,28 +398,17 @@ const styles = StyleSheet.create({
         fontSize: 17,
         padding: 5,
         whiteSpace: "nowrap",
-        textAlign: "left"
+        flex: "0 0 20px",
+        textAlign: "left",
     },
 
     run: {
+        backgroundColor: "#00aeef",
         width: "100%",
         boxSizing: "border-box",
         overflow: "scroll",
         cursor: "pointer",
         padding: 5,
-        margin: "1px 0px",
-        textAlign: "left",
-        minHeight: 85,
-        /* This doesn't work like it should, lol */
-        /*
-        ":nth-child(even)": {
-            backgroundColor: "#00aeef"
-        },
-        ":nth-child(odd)": {
-            backgroundColor: "#f21847"
-        },
-        */
-        backgroundColor: "#00aeef",
     },
 
     done: {
