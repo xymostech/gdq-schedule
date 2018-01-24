@@ -132,7 +132,8 @@ const MomentPropType = PropTypes.instanceOf(moment);
 const DurationPropType = function(props, propName, componentName) {
     if (!props[propName].isDuration || !props[propName].isDuration()) {
         return new Error(
-            `Invalid prop ${propName} supplied to ${componentName}. Expected Moment Duration`);
+            `Invalid prop ${propName} supplied to ${componentName}. Expected Moment Duration`,
+        );
     }
 };
 
@@ -304,7 +305,11 @@ class App extends React.Component {
                             {day.runs.map(
                                 (run, j) =>
                                     run.type === "run" ? (
-                                        <Run key={j} run={run} now={this.state.now} />
+                                        <Run
+                                            key={j}
+                                            run={run}
+                                            now={this.state.now}
+                                        />
                                     ) : (
                                         <div
                                             key={j}
@@ -324,27 +329,36 @@ class App extends React.Component {
         );
 
         return (
-          <div className={css(styles.app)}>
-              <header className={css(styles.header)}>
-                  <h1>AGDQ Schedule</h1>
-                  <nav className={css(styles.headNavs)}>
-                      <a className={css(styles.headNavsLinks)} href="https://gamesdonequick.com/tracker/donate/22">
-                          Donate
-                      </a>
-                  </nav>
-                  <nav className={css(styles.headNavs)}>
-                      <a className={css(styles.headNavsLinks)} href="https://www.twitch.tv/gamesdonequick">
-                          Watch
-                      </a>
-                  </nav>
-                  <nav className={css(styles.headNavs)}>
-                      <a className={css(styles.headNavsLinks)} href="https://github.com/xymostech/gdq-schedule">
-                          Github
-                      </a>
-                  </nav>
-              </header>
-              {chart}
-          </div>
+            <div className={css(styles.app)}>
+                <header className={css(styles.header)}>
+                    <h1>AGDQ Schedule</h1>
+                    <nav className={css(styles.headNavs)}>
+                        <a
+                            className={css(styles.headNavsLinks)}
+                            href="https://gamesdonequick.com/tracker/donate/22"
+                        >
+                            Donate
+                        </a>
+                    </nav>
+                    <nav className={css(styles.headNavs)}>
+                        <a
+                            className={css(styles.headNavsLinks)}
+                            href="https://www.twitch.tv/gamesdonequick"
+                        >
+                            Watch
+                        </a>
+                    </nav>
+                    <nav className={css(styles.headNavs)}>
+                        <a
+                            className={css(styles.headNavsLinks)}
+                            href="https://github.com/xymostech/gdq-schedule"
+                        >
+                            Github
+                        </a>
+                    </nav>
+                </header>
+                {chart}
+            </div>
         );
     }
 }
@@ -406,7 +420,7 @@ const styles = StyleSheet.create({
         borderTop: "10px solid transparent",
         borderBottom: "10px solid transparent",
         borderRight: "10px solid black",
-        zIndex: 1
+        zIndex: 1,
     },
 
     dayLabel: {
@@ -463,7 +477,7 @@ const styles = StyleSheet.create({
     eventTimes: {
         fontSize: 14,
         paddingBottom: 5,
-    }
+    },
 });
 
 ReactDOM.render(<App />, document.getElementById("main"));
