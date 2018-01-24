@@ -4,6 +4,7 @@ import {StyleSheet, css} from "aphrodite";
 import moment from "moment";
 import Popover from "react-popover";
 import "normalize.css";
+import PropTypes from "prop-types";
 
 function parseTime(time) {
     return moment.utc(time).local();
@@ -127,7 +128,31 @@ function formatDuration(duration) {
     return result;
 }
 
+const MomentPropType = PropTypes.instanceOf(moment);
+const DurationPropType = function(props, propName, componentName) {
+    if (!props[propName].isDuration || !props[propName].isDuration()) {
+        return new Error(
+            `Invalid prop ${propName} supplied to ${componentName}. Expected Moment Duration`);
+    }
+};
+
 class Run extends React.Component {
+    static propTypes = {
+        now: MomentPropType.isRequired,
+        run: PropTypes.shape({
+            info: PropTypes.shape({
+                name: PropTypes.string.isRequired,
+                host: PropTypes.string.isRequired,
+                runKind: PropTypes.string.isRequired,
+                time: MomentPropType.isRequired,
+                duration: DurationPropType.isRequired,
+            }).isRequired,
+            duration: PropTypes.number.isRequired,
+            runsOver: PropTypes.bool,
+            runOver: PropTypes.bool,
+        }).isRequired,
+    };
+
     state = {
         open: false,
     };
@@ -201,14 +226,6 @@ class Run extends React.Component {
             </Popover>
         );
     }
-}
-
-function range(n) {
-    const arr = [];
-    for (let i = 0; i < n; i++) {
-        arr.push(i);
-    }
-    return arr;
 }
 
 class App extends React.Component {
@@ -287,9 +304,10 @@ class App extends React.Component {
                             {day.runs.map(
                                 (run, j) =>
                                     run.type === "run" ? (
-                                        <Run run={run} now={this.state.now} />
+                                        <Run key={j} run={run} now={this.state.now} />
                                     ) : (
                                         <div
+                                            key={j}
                                             style={{
                                                 flex: run.duration,
                                             }}
