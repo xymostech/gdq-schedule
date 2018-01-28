@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
         boxSizing: "border-box",
         maxWidth: 1300,
         width: "100%",
-        fontFamily: "sans-serif",
+        fontFamily: "Arvo, serif",
     },
 
     header: {
@@ -426,7 +426,6 @@ const styles = StyleSheet.create({
     dayLabel: {
         backgroundColor: "#333333",
         color: "#FFFFFF",
-        fontFamily: "sans-serif",
         fontSize: 17,
         padding: 5,
         whiteSpace: "nowrap",
@@ -471,7 +470,6 @@ const styles = StyleSheet.create({
         padding: 10,
         fontSize: 15,
         opacity: 0.95,
-        fontFamily: "sans-serif",
     },
 
     eventTimes: {
