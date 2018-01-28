@@ -173,14 +173,14 @@ class Run extends React.Component {
     };
 
     render() {
-        const run = this.props.run;
-        const info = run.info;
+        const {run, now} = this.props;
+        const {info} = run;
 
         const isSetup = /SETUP BLOCK/.test(info.name);
         const isDone = info.time
             .clone()
             .add(info.duration)
-            .isBefore(this.props.now);
+            .isBefore(now);
 
         const popover = (
             <div className={css(styles.popover)}>
@@ -211,18 +211,27 @@ class Run extends React.Component {
             >
                 <div
                     style={{
-                        flex: this.props.run.duration,
+                        flex: run.duration,
                     }}
                     className={css(
                         styles.run,
                         isSetup && styles.setupBlock,
                         isDone && styles.done,
-                        this.props.run.runsOver && styles.runsOver,
-                        this.props.run.runOver && styles.runOver,
+                        run.runsOver && styles.runsOver,
+                        run.runOver && styles.runOver,
                     )}
                     onClick={this.handleClickIn}
                 >
-                    {info.name}
+                    <div className={css(styles.runTimeInfo)}>
+                        {info.time.format("h:mm a")} &ndash;{" "}
+                        {info.time
+                            .clone()
+                            .add(info.duration)
+                            .format("h:mm a")}
+                    </div>
+                    <div className={css(styles.runName)}>
+                        {info.name}
+                    </div>
                 </div>
             </Popover>
         );
@@ -475,6 +484,15 @@ const styles = StyleSheet.create({
     eventTimes: {
         fontSize: 14,
         paddingBottom: 5,
+    },
+
+    runTimeInfo: {
+        fontSize: 12,
+    },
+
+    runName: {
+        fontWeight: "bold",
+        marginTop: 2,
     },
 });
 
