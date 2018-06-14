@@ -36,7 +36,7 @@ function parseDataToDays(data) {
             : moment.duration(0);
     });
 
-    const eventStart = moment.utc("2018-01-07T16:30:00Z").local();
+    const eventStart = moment.utc("2018-06-24T16:30:00Z").local();
     const eventDayStart = startOfDay(eventStart);
 
     const days = [{day: eventDayStart, runs: []}];
