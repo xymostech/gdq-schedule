@@ -43,7 +43,4 @@ module.exports = {
     module: {
         loaders: loaders,
     },
-    devServer: {
-        contentBase: __dirname,
-    },
 };

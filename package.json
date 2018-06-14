@@ -6,15 +6,17 @@
     "fetch-data": "node tools/fetch-data.js",
     "build": "NODE_ENV=production webpack",
     "publish": "npm run fetch-data && npm run build && now",
-    "start": "npm run fetch-data && webpack-dev-server --content-base build/ --port 5050"
+    "start": "npm run fetch-data && concurrently \"webpack --watch\" \"serve -p 5050\""
   },
   "dependencies": {
     "aphrodite": "1.2.5",
+    "concurrently": "^3.5.1",
     "moment": "^2.20.1",
     "normalize.css": "7.0.0",
     "react": "16.2.0",
     "react-dom": "16.2.0",
-    "react-popover": "0.5.4"
+    "react-popover": "0.5.4",
+    "serve": "^8.2.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
