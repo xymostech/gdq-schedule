@@ -54,7 +54,7 @@ export default class App extends React.Component {
                         </a>
                     </nav>
                 </header>
-                <hr />
+                <hr className={css(styles.rule)}/>
                 <div className={css(styles.content)}>{this.props.children}</div>
                 <footer className={css(styles.footer)}>
                     Made by Xymostech and Jett Burns. Not affiliated with Games Done Quick
@@ -80,6 +80,10 @@ const styles = StyleSheet.create({
         height: 70,
         alignItems: "flex-end",
         boxSizing: "border-box",
+    },
+
+    rule: {
+        margin: "0 0 32px",
     },
 
     content: {
