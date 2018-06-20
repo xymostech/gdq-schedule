@@ -54,7 +54,11 @@ export default class App extends React.Component {
                         </a>
                     </nav>
                 </header>
-                {this.props.children}
+                <hr />
+                <div className={css(styles.content)}>{this.props.children}</div>
+                <footer className={css(styles.footer)}>
+                    Made by Xymostech and Jett Burns. Not affiliated with Games Done Quick
+                </footer>
             </div>
         );
     }
@@ -63,10 +67,7 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
     app: {
         ...fonts.body,
-        margin: "0 auto",
-        paddingBottom: 10,
         boxSizing: "border-box",
-        maxWidth: 1300,
         width: "100%",
         color: colors.black,
     },
@@ -74,11 +75,16 @@ const styles = StyleSheet.create({
     header: {
         display: "flex",
         padding: "0px 0px 16px 15px",
-        margin: "-8px 0px 40px 0px",
-        borderBottom: "1px solid #c1c1c1",
+        maxWidth: 1300,
+        margin: "-8px auto 0",
         height: 70,
         alignItems: "flex-end",
         boxSizing: "border-box",
+    },
+
+    content: {
+        maxWidth: 1300,
+        margin: "0 auto",
     },
 
     headerTitle: {
@@ -100,5 +106,13 @@ const styles = StyleSheet.create({
             textDecoration: "underline",
             color: "#00aeef",
         },
+    },
+
+    footer: {
+        marginTop: 20,
+        backgroundColor: "#333",
+        color: "white",
+        textAlign: "center",
+        padding: 8,
     },
 });
