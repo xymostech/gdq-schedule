@@ -384,11 +384,14 @@ const styles = StyleSheet.create({
     },
 
     day: {
-        marginLeft: 2,
         display: "flex",
         flexDirection: "column",
         flexBasis: "12.5%",
         position: "relative",
+
+        ":nth-child(n+2)": {
+            marginLeft: 2,
+        },
     },
 
     currentTimeIndicatorWrapper: {
