@@ -43,4 +43,12 @@ module.exports = {
     module: {
         loaders: loaders,
     },
+    devServer: {
+        port: 5050,
+        contentBase: __dirname,
+        publicPath: "/build",
+        historyApiFallback: {
+            index: 'index.html',
+        },
+    },
 };
