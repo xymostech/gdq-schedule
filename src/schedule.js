@@ -183,6 +183,14 @@ class Run extends React.Component {
             .add(info.duration)
             .isBefore(now) : false;
 
+        const timeFormat = <span>
+            {info.time.format("h:mm A")} &ndash;{" "}
+            {info.time
+                .clone()
+                .add(info.duration)
+                .format("h:mm A")}
+        </span>;
+
         const popover = (
             <div className={css(styles.popover)}>
                 <div>
@@ -193,12 +201,7 @@ class Run extends React.Component {
                 {!isSetup && <div>{info.runKind}</div>}
                 <div>Host: {info.host}</div>
                 <div>
-                    {info.time.format("h:mm a")} &ndash;{" "}
-                    {info.time
-                        .clone()
-                        .add(info.duration)
-                        .format("h:mm a")}{" "}
-                    ({formatDuration(info.duration)})
+                    {timeFormat} ({formatDuration(info.duration)})
                 </div>
             </div>
         );
@@ -223,15 +226,17 @@ class Run extends React.Component {
                     )}
                     onClick={this.handleClickIn}
                 >
-                    <div className={css(styles.runTimeInfo)}>
-                        {info.time.format("h:mm A")} &ndash;{" "}
-                        {info.time
-                            .clone()
-                            .add(info.duration)
-                            .format("h:mm A")}
-                    </div>
+                    {run.duration >= 45 &&
+                        <div className={css(styles.runTimeInfo)}>
+                            {info.time.format("h:mm A")} &ndash;{" "}
+                            {info.time
+                                .clone()
+                                .add(info.duration)
+                                .format("h:mm A")}
+                        </div>}
                     <div className={css(styles.runName)}>
                         {info.name}
+                        {run.duration < 45 && <span className={css(styles.runTimeInfo)}>{" "}({timeFormat})</span>}
                     </div>
                 </div>
             </Popover>
@@ -473,6 +478,7 @@ const styles = StyleSheet.create({
 
     runTimeInfo: {
         fontSize: 12,
+        fontWeight: "normal",
     },
 
     runName: {
