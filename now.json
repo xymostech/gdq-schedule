@@ -8,5 +8,10 @@
     "README.md",
     "LICENSE.txt"
   ],
+  "static": {
+    "rewrites": [
+      { "source": "**", "destination": "/index.html" }
+    ]
+  },
   "type": "static"
 }
