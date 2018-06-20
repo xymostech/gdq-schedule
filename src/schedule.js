@@ -4,6 +4,8 @@ import moment from "moment";
 import Popover from "react-popover";
 import PropTypes from "prop-types";
 
+import {colors, fonts} from "./constants.js";
+
 function parseTime(time) {
     return moment.utc(time).local();
 }
@@ -222,11 +224,11 @@ class Run extends React.Component {
                     onClick={this.handleClickIn}
                 >
                     <div className={css(styles.runTimeInfo)}>
-                        {info.time.format("h:mm a")} &ndash;{" "}
+                        {info.time.format("h:mm A")} &ndash;{" "}
                         {info.time
                             .clone()
                             .add(info.duration)
-                            .format("h:mm a")}
+                            .format("h:mm A")}
                     </div>
                     <div className={css(styles.runName)}>
                         {info.name}
@@ -351,13 +353,30 @@ export default class Schedule extends React.Component {
         );
 
         return <div>
-            <h1>{this.props.name}</h1>
+            <h1 className={css(
+                styles.title,
+                this.props.color === "red" && styles.redTitle,
+                this.props.color === "blue" && styles.blueTitle
+            )}>{this.props.name}</h1>
             {chart}
         </div>;
     }
 }
 
 const styles = StyleSheet.create({
+    title: {
+        ...fonts.display,
+        textAlign: "center",
+    },
+
+    redTitle: {
+        color: colors.red,
+    },
+
+    blueTitle: {
+        color: colors.blue,
+    },
+
     chart: {
         width: "100%",
         display: "flex",
@@ -392,13 +411,15 @@ const styles = StyleSheet.create({
     },
 
     dayLabel: {
+        ...fonts.display,
         backgroundColor: "#333333",
         color: "#FFFFFF",
-        fontSize: 17,
+        fontSize: 14,
         padding: 5,
         whiteSpace: "nowrap",
         flex: "0 0 20px",
-        textAlign: "left",
+        lineHeight: "20px",
+        textAlign: "center",
     },
 
     run: {
@@ -431,8 +452,10 @@ const styles = StyleSheet.create({
     },
 
     popover: {
+        ...fonts.body,
+        color: colors.black,
         backgroundColor: "#fff",
-        border: "2px solid #00aeef",
+        border: `2px solid ${colors.red}`,
         borderRadius: 3,
         boxShadow: "1px 1px 2px #b3b3b3",
         padding: 10,

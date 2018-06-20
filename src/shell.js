@@ -2,6 +2,8 @@ import React from "react";
 import {StyleSheet, css} from "aphrodite";
 import PropTypes from "prop-types";
 
+import {colors, fonts} from "./constants.js";
+
 export default class App extends React.Component {
     static propTypes = {
         children: PropTypes.node,
@@ -60,12 +62,13 @@ export default class App extends React.Component {
 
 const styles = StyleSheet.create({
     app: {
+        ...fonts.body,
         margin: "0 auto",
         paddingBottom: 10,
         boxSizing: "border-box",
         maxWidth: 1300,
         width: "100%",
-        fontFamily: "Arvo, serif",
+        color: colors.black,
     },
 
     header: {
@@ -79,12 +82,13 @@ const styles = StyleSheet.create({
     },
 
     headerTitle: {
-        fontSize: "1.5em",
-        lineHeight: 1,
+        ...fonts.display,
+        fontSize: "2em",
         margin: 0,
     },
 
     headNavs: {
+        ...fonts.display,
         paddingLeft: "2%",
     },
 
