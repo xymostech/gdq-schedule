@@ -352,6 +352,9 @@ export default class Schedule extends React.Component {
                                         />
                                     ),
                             )}
+                            <div className={css(styles.dayLabel)}>
+                                {day.day.clone().add(1, "days").format("ddd, MMM Do")}
+                            </div>
                         </div>
                     ))}
             </div>
@@ -422,7 +425,7 @@ const styles = StyleSheet.create({
         ...fonts.display,
         backgroundColor: "#333333",
         color: "#FFFFFF",
-        fontSize: 14,
+        fontSize: 12,
         padding: 5,
         whiteSpace: "nowrap",
         flex: "0 0 20px",
