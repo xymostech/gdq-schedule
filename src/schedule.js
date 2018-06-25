@@ -10,10 +10,6 @@ function parseTime(time) {
     return moment.utc(time).local();
 }
 
-function msToMinutes(ms) {
-    return ms / 1000 / 60;
-}
-
 function startOfDay(date) {
     return date
         .clone()
@@ -43,12 +39,17 @@ function parseDataToDays(data, startTime) {
 
     days[0].runs.push({
         type: "spacer",
-        duration: msToMinutes(eventStart.diff(eventDayStart)),
+        duration: eventStart.diff(eventDayStart),
     });
 
+    let lastRunEnd = eventStart;
+
     data.forEach(function(d) {
-        const setupTime = d.time.clone().subtract(d.setupLength);
+        const setupTime = lastRunEnd.clone();
+        const setupLength = d.time.diff(setupTime);
         const runEndTime = d.time.clone().add(d.duration);
+
+        lastRunEnd = runEndTime;
 
         const setupDate = setupTime.date() - eventDayStart.date();
         const runStartDate = d.time.date() - eventDayStart.date();
@@ -60,27 +61,27 @@ function parseDataToDays(data, startTime) {
         if (setupTime.isSame(d.time, "day")) {
             days[setupDate].runs.push({
                 type: "setup",
-                duration: msToMinutes(d.setupLength.asMilliseconds()),
+                duration: setupLength,
             });
         } else {
             const runDayStart = startOfDay(d.time);
             days[setupDate].runs.push({
                 type: "setup",
                 runsOver: true,
-                duration: msToMinutes(runDayStart.diff(setupTime)),
+                duration: runDayStart.diff(setupTime),
                 info: d,
             });
             days[runStartDate].runs.push({
                 type: "setup",
                 runOver: true,
-                duration: msToMinutes(d.time.diff(runDayStart)),
+                duration: d.time.diff(runDayStart),
                 info: d,
             });
         }
         if (d.time.isSame(runEndTime, "day")) {
             days[runStartDate].runs.push({
                 type: "run",
-                duration: msToMinutes(d.duration.asMilliseconds()),
+                duration: d.duration.asMilliseconds(),
                 info: d,
             });
         } else {
@@ -88,13 +89,13 @@ function parseDataToDays(data, startTime) {
             days[runStartDate].runs.push({
                 type: "run",
                 runsOver: true,
-                duration: msToMinutes(runEndDayStart.diff(d.time)),
+                duration: runEndDayStart.diff(d.time),
                 info: d,
             });
             days[runEndDate].runs.push({
                 type: "run",
                 runOver: true,
-                duration: msToMinutes(runEndTime.diff(runEndDayStart)),
+                duration: runEndTime.diff(runEndDayStart),
                 info: d,
             });
         }
@@ -107,7 +108,7 @@ function parseDataToDays(data, startTime) {
 
     days[lastEndDate].runs.push({
         type: "spacer",
-        duration: msToMinutes(lastEndNextDay.diff(lastEndTime)),
+        duration: lastEndNextDay.diff(lastEndTime),
     });
 
     return days;
@@ -136,6 +137,10 @@ const DurationPropType = function(props, propName, componentName) {
         );
     }
 };
+
+function scaleMsToHeight(ms) {
+    return ms / 1000 / 30;
+}
 
 class Run extends React.Component {
     static propTypes = {
@@ -215,7 +220,7 @@ class Run extends React.Component {
             >
                 <div
                     style={{
-                        flex: run.duration,
+                        height: scaleMsToHeight(run.duration),
                     }}
                     className={css(
                         styles.run,
@@ -226,17 +231,19 @@ class Run extends React.Component {
                     )}
                     onClick={this.handleClickIn}
                 >
-                    {run.duration >= 45 &&
-                        <div className={css(styles.runTimeInfo)}>
-                            {info.time.format("h:mm A")} &ndash;{" "}
-                            {info.time
-                                .clone()
-                                .add(info.duration)
-                                .format("h:mm A")}
-                        </div>}
-                    <div className={css(styles.runName)}>
-                        {info.name}
-                        {run.duration < 45 && <span className={css(styles.runTimeInfo)}>{" "}({timeFormat})</span>}
+                    <div className={css(styles.runInner)}>
+                        {run.duration >= 1200000 &&
+                            <div className={css(styles.runTimeInfo)}>
+                                {info.time.format("h:mm A")} &ndash;{" "}
+                                {info.time
+                                    .clone()
+                                    .add(info.duration)
+                                    .format("h:mm A")}
+                            </div>}
+                        <div className={css(styles.runName)}>
+                            {info.name}
+                            {run.duration < 1200000 && <span className={css(styles.runTimeInfo)}>{" "}({timeFormat})</span>}
+                        </div>
                     </div>
                 </div>
             </Popover>
@@ -304,7 +311,7 @@ export default class Schedule extends React.Component {
                                 >
                                     <div
                                         style={{
-                                            flex: msToMinutes(
+                                            height: scaleMsToHeight(
                                                 this.state.now.diff(
                                                     startOfDay(this.state.now),
                                                 ),
@@ -318,7 +325,7 @@ export default class Schedule extends React.Component {
                                     />
                                     <div
                                         style={{
-                                            flex: msToMinutes(
+                                            height: scaleMsToHeight(
                                                 startOfNextDay(
                                                     this.state.now,
                                                 ).diff(this.state.now),
@@ -343,7 +350,7 @@ export default class Schedule extends React.Component {
                                         <div
                                             key={j}
                                             style={{
-                                                flex: run.duration,
+                                                height: scaleMsToHeight(run.duration),
                                             }}
                                             className={css(
                                                 run.type === "setup" &&
@@ -439,7 +446,16 @@ const styles = StyleSheet.create({
         boxSizing: "border-box",
         overflow: "hidden",
         cursor: "pointer",
-        padding: 5,
+        paddingLeft: 5,
+        paddingRight: 5,
+    },
+
+    runInner: {
+        // If we set a padding-top and padding-bottom on run, then it will
+        // never shrink to smaller than the size of the padding combined. To
+        // counter this, we put a margin on an inner element.
+        marginTop: 5,
+        marginBottom: 5,
     },
 
     done: {
@@ -480,7 +496,7 @@ const styles = StyleSheet.create({
     },
 
     runTimeInfo: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: "normal",
     },
 
