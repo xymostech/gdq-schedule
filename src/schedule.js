@@ -301,7 +301,13 @@ export default class Schedule extends React.Component {
             <div className={css(styles.chart)}>
                 {this.state.days &&
                     this.state.days.map((day, i) => (
-                        <div key={i} className={css(styles.day)}>
+                        <div
+                            key={i}
+                            className={css(styles.day)}
+                            style={{
+                                flexBasis: `${100 / this.state.days.length}%`,
+                            }}
+                        >
                             {this.props.showCurrentTime && this.state.now.isSame(day.day, "day") && (
                                 <div
                                     key="curr-indicator"
@@ -401,7 +407,6 @@ const styles = StyleSheet.create({
     day: {
         display: "flex",
         flexDirection: "column",
-        flexBasis: "12.5%",
         position: "relative",
 
         ":nth-child(n+2)": {
