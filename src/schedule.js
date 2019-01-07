@@ -5,6 +5,7 @@ import Popover from "react-popover";
 import PropTypes from "prop-types";
 
 import {colors, fonts} from "./constants.js";
+import SearchIcon from "./search-icon.js";
 
 function parseTime(time) {
     return moment.utc(time).local();
@@ -158,6 +159,7 @@ class Run extends React.Component {
             runsOver: PropTypes.bool,
             runOver: PropTypes.bool,
         }).isRequired,
+        filter: PropTypes.string,
     };
 
     state = {
@@ -179,10 +181,14 @@ class Run extends React.Component {
     };
 
     render() {
-        const {run, now, showCurrentTime} = this.props;
+        const {run, now, showCurrentTime, filter} = this.props;
         const {info} = run;
 
         const isSetup = /SETUP BLOCK/.test(info.name);
+
+        const hasFilter = filter.length > 0;
+        const isSelected = new RegExp(filter, "i").test(info.name);
+
         const isDone = showCurrentTime ? info.time
             .clone()
             .add(info.duration)
@@ -225,7 +231,10 @@ class Run extends React.Component {
                     className={css(
                         styles.run,
                         isSetup && styles.setupBlock,
-                        isDone && styles.done,
+                        hasFilter && !isSelected && styles.deselected,
+                        !(hasFilter && isSelected) && isDone && styles.done,
+                        hasFilter && !isSelected && isDone
+                            && styles.deselectedAndDone,
                         run.runsOver && styles.runsOver,
                         run.runOver && styles.runOver,
                     )}
@@ -267,6 +276,7 @@ export default class Schedule extends React.Component {
     state = {
         now: now(),
         days: null,
+        filter: "",
     };
 
     componentDidMount() {
@@ -355,6 +365,7 @@ export default class Schedule extends React.Component {
                                             run={run}
                                             now={this.state.now}
                                             showCurrentTime={this.props.showCurrentTime}
+                                            filter={this.state.filter}
                                         />
                                     ) : (
                                         <div
@@ -383,6 +394,22 @@ export default class Schedule extends React.Component {
                 this.props.color === "red" && styles.redTitle,
                 this.props.color === "blue" && styles.blueTitle
             )}>{this.props.name}</h1>
+            <div className={css(styles.searchCenter)}>
+                <div className={css(styles.searchWrap)}>
+                    <div className={css(styles.searchIcon)}>
+                        <SearchIcon />
+                    </div>
+                    <input
+                        type="text"
+                        className={css(styles.search)}
+                        placeholder="Search runs..."
+                        value={this.state.filter}
+                        onChange={e => this.setState({
+                            filter: e.target.value,
+                        })}
+                    />
+                </div>
+            </div>
             {chart}
         </div>;
     }
@@ -450,7 +477,7 @@ const styles = StyleSheet.create({
     },
 
     run: {
-        backgroundColor: "#00aeef",
+        backgroundColor: colors.blue,
         width: "100%",
         boxSizing: "border-box",
         overflow: "hidden",
@@ -469,6 +496,14 @@ const styles = StyleSheet.create({
 
     done: {
         opacity: 0.7,
+    },
+
+    deselected: {
+        opacity: 0.55,
+    },
+
+    deselectedAndDone: {
+        opacity: 0.4,
     },
 
     runOver: {
@@ -512,5 +547,31 @@ const styles = StyleSheet.create({
     runName: {
         fontWeight: "bold",
         marginTop: 2,
+    },
+
+    searchCenter: {
+        display: "flex",
+        justifyContent: "center",
+        marginBottom: 15,
+    },
+
+    searchWrap: {
+        position: "relative",
+    },
+
+    search: {
+        appearance: "none",
+        border: `2px solid ${colors.gray}`,
+        height: 20,
+        borderRadius: 10,
+        width: 200,
+        padding: "2px 4px 2px 27px",
+        color: colors.black,
+    },
+
+    searchIcon: {
+        position: "absolute",
+        top: 3,
+        left: 4,
     },
 });
