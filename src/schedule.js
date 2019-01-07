@@ -251,6 +251,10 @@ class Run extends React.Component {
     }
 }
 
+function now() {
+    return moment();
+}
+
 export default class Schedule extends React.Component {
     static propTypes = {
         name: PropTypes.string.isRequired,
@@ -261,7 +265,7 @@ export default class Schedule extends React.Component {
     };
 
     state = {
-        now: moment(),
+        now: now(),
         days: null,
     };
 
@@ -269,7 +273,7 @@ export default class Schedule extends React.Component {
         if (this.props.showCurrentTime) {
             this._refreshTimer = setInterval(() => {
                 this.setState({
-                    now: moment(),
+                    now: now(),
                 });
             }, 1000 * 15);
         }
