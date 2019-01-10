@@ -314,6 +314,53 @@ export default class Schedule extends React.Component {
     }
 
     render() {
+        let currentRun = null;
+        let nextRun = null;
+        if (this.state.days && this.props.showCurrentTime) {
+            // Go through all the runs in all the days.
+            this.state.days.forEach(day => {
+                day.runs.forEach(run => {
+                    if (run.type !== "run") {
+                        // We ignore non-run segments here, because they don't
+                        // contain the time info that we need.
+                        return;
+                    }
+
+                    if (!nextRun && currentRun) {
+                        // If we have found a "current" run but not a "next"
+                        // run yet, then this is the next run.
+                        nextRun = run;
+                    }
+
+                    if (currentRun) {
+                        // If we've already found a current run, ignore the
+                        // rest here.
+                        return;
+                    }
+
+                    if (
+                        run.info.time.clone()
+                            .add(run.info.duration)
+                            .isBefore(this.state.now)
+                    ) {
+                        // If this run has ended, bail out
+                        return;
+                    }
+
+                    if (run.info.time.isBefore(this.state.now)) {
+                        // If this run has already started, it's the current
+                        // run.
+                        currentRun = run;
+                    } else {
+                        // If this run hasn't started, then we're in a setup
+                        // stage and this run is up next.
+                        currentRun = {type: "setup"};
+                        nextRun = run;
+                    }
+                });
+            });
+        }
+
         const chart = (
             <div className={css(styles.chart)}>
                 {this.state.days &&
@@ -397,7 +444,25 @@ export default class Schedule extends React.Component {
                 this.props.color === "red" && styles.redTitle,
                 this.props.color === "blue" && styles.blueTitle
             )}>{this.props.name}</h1>
-            <div className={css(styles.searchCenter)}>
+            <div className={css(styles.subtitle)}>
+                {currentRun && <div className={css(styles.nowNextWrap)}>
+                    <div className={css(styles.onNow)}>On now</div>
+                    <div className={css(styles.nowNextTitle)}>
+                        {currentRun.type === "run" ? currentRun.info.name : "Setup"}
+                    </div>
+                    {currentRun.type === "run" && <div className={css(styles.nowNextTime)}>
+                        ({currentRun.info.time.clone().add(currentRun.info.duration).from(this.state.now, true)} remaining)
+                    </div>}
+                </div>}
+
+                {nextRun && <div className={css(styles.nowNextWrap)}>
+                    <div className={css(styles.upNext)}>Up next</div>
+                    <div className={css(styles.nowNextTitle)}>{nextRun.info.name}</div>
+                    <div className={css(styles.nowNextTime)}>
+                        (starts at {nextRun.info.time.format("h:mm A")})
+                    </div>
+                </div>}
+
                 <div className={css(styles.searchWrap)}>
                     <div className={css(styles.searchIcon)}>
                         <SearchIcon />
@@ -552,9 +617,10 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
 
-    searchCenter: {
+    subtitle: {
         display: "flex",
         justifyContent: "center",
+        alignItems: "flex-start",
         marginBottom: 15,
     },
 
@@ -576,5 +642,39 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: 3,
         left: 4,
+    },
+
+    nowNextWrap: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        marginRight: 24,
+    },
+
+    nowNextTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginTop: 6,
+        maxWidth: 280,
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+    },
+
+    nowNextTime: {
+        marginTop: 2,
+        fontSize: 14,
+    },
+
+    onNow: {
+        ...fonts.display,
+        fontSize: 14,
+        color: colors.blue,
+    },
+
+    upNext: {
+        ...fonts.display,
+        fontSize: 14,
+        color: colors.red,
     },
 });
