@@ -122,9 +122,12 @@ function formatDuration(duration) {
     const minutes = duration.minutes();
 
     if (hours > 0) {
-        result += `${hours} ${hours === 1 ? "hour" : "hours"} `;
+        result += `${hours} ${hours === 1 ? "hour" : "hours"}`;
     }
-    if (minutes > 0) {
+    if (minutes > 0 || hours === 0) {
+        if (result.length > 0) {
+            result += " ";
+        }
         result += `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
     }
     return result;
