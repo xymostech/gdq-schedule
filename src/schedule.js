@@ -452,6 +452,15 @@ export default class Schedule extends React.Component {
             </div>
         );
 
+        let nextStartsAt;
+        if (nextRun) {
+            nextStartsAt = `starts at ${nextRun.info.time.format("h:mm A")}`;
+
+            if (!nextRun.info.time.isSame(this.state.now, "day")) {
+                nextStartsAt = `starts on ${nextRun.info.time.format("MMM Do, h:mm A")}`;
+            }
+        }
+
         return <div>
             <h1 className={css(
                 styles.title,
@@ -473,7 +482,7 @@ export default class Schedule extends React.Component {
                     <div className={css(styles.upNext)}>Up next</div>
                     <div className={css(styles.nowNextTitle)}>{nextRun.info.name}</div>
                     <div className={css(styles.nowNextTime)}>
-                        (starts at {nextRun.info.time.format("h:mm A")})
+                        ({nextStartsAt})
                     </div>
                 </div>}
 
