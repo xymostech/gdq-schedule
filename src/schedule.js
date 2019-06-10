@@ -317,6 +317,9 @@ export default class Schedule extends React.Component {
         let currentRun = null;
         let nextRun = null;
         if (this.state.days && this.props.showCurrentTime) {
+            // Keep track of whether we're looking at the first run.
+            let firstRun = true;
+
             // Go through all the runs in all the days.
             this.state.days.forEach(day => {
                 day.runs.forEach(run => {
@@ -352,11 +355,22 @@ export default class Schedule extends React.Component {
                         // run.
                         currentRun = run;
                     } else {
-                        // If this run hasn't started, then we're in a setup
-                        // stage and this run is up next.
-                        currentRun = {type: "setup"};
+                        // If this run hasn't started then this run is up next.
                         nextRun = run;
+
+                        if (firstRun) {
+                            // If we're before the very first run in the gdq,
+                            // then mark this as the "beginning" so that we
+                            // don't show an "on now" element.
+                            currentRun = {type: "beginning"};
+                        } else {
+                            // If we're before an event but not at the first
+                            // run, then we're in a setup block.
+                            currentRun = {type: "setup"};
+                        }
                     }
+
+                    firstRun = false;
                 });
             });
         }
@@ -445,7 +459,7 @@ export default class Schedule extends React.Component {
                 this.props.color === "blue" && styles.blueTitle
             )}>{this.props.name}</h1>
             <div className={css(styles.subtitle)}>
-                {currentRun && <div className={css(styles.nowNextWrap)}>
+                {currentRun && currentRun.type !== "beginning" && <div className={css(styles.nowNextWrap)}>
                     <div className={css(styles.onNow)}>On now</div>
                     <div className={css(styles.nowNextTitle)}>
                         {currentRun.type === "run" ? currentRun.info.name : "Setup"}
