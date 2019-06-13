@@ -1,11 +1,11 @@
 import React from "react";
 import {StyleSheet, css} from "aphrodite";
 import moment from "moment";
-import Popover from "react-popover";
 import PropTypes from "prop-types";
 
 import {colors, fonts} from "./constants.js";
 import SearchIcon from "./search-icon.js";
+import Popover from "./popover.js";
 
 function parseTime(time) {
     return moment.utc(time).local();
@@ -622,7 +622,6 @@ const styles = StyleSheet.create({
         boxShadow: "1px 1px 2px #b3b3b3",
         padding: 10,
         fontSize: 15,
-        opacity: 0.95,
     },
 
     eventTimes: {
