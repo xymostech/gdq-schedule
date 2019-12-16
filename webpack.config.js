@@ -1,17 +1,18 @@
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 var webpack = require('webpack');
 
 var loaders = [
   {
-    "test": /\.jsx?$/,
-    "exclude": /node_modules/,
-    "loader": "babel-loader",
+    test: /\.jsx?$/,
+    exclude: /node_modules/,
+    use: {
+        loader: "babel-loader",
+    },
   },
   {
-    "test": /\.css?$/,
-    "loader": "style-loader!css-loader?modules",
+    test: /\.css?$/,
+    use: ["style-loader", "css-loader"],
   },
 ];
 
@@ -28,20 +29,14 @@ module.exports = {
     },
     plugins: [
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-        new webpack.DefinePlugin({
-            'process.env': {
-                'NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-            }
-        }),
         new HtmlWebpackPlugin({
             template: path.resolve('src', 'dev.html'),
             filename: 'index.html',
             inject: false,
         }),
-        new UglifyJsPlugin(),
     ],
     module: {
-        loaders: loaders,
+        rules: loaders,
     },
     devServer: {
         port: 5050,
@@ -51,4 +46,5 @@ module.exports = {
             index: 'index.html',
         },
     },
+    mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 };
