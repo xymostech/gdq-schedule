@@ -1,17 +1,15 @@
 {
+  "version": 2,
   "name": "gdq-schedule",
   "alias": "gdq-schedule.com",
-  "files": [
-    "index.html",
-    "build/main.js",
-    "data/schedule.json",
-    "README.md",
-    "LICENSE.txt"
+  "builds": [
+    {"src": "build/**", "use": "@now/static"},
+    {"src": "data/**", "use": "@now/static"},
+    {"src": "index.html", "use": "@now/static"}
   ],
-  "static": {
-    "rewrites": [
-      { "source": "**", "destination": "/index.html" }
-    ]
-  },
-  "type": "static"
+  "routes": [
+    {"src": "/data/(.*)", "dest": "/data/$1"},
+    {"src": "/build/(.*)", "dest": "/data/$1"},
+    {"src": "/(.*)", "dest": "index.html"}
+  ]
 }
