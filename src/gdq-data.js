@@ -1,14 +1,20 @@
 export const current = {
-    name: "Summer Games Done Quick 2019",
-    color: "red",
+    name: "Awesome Games Done Quick 2019",
+    color: "blue",
     scheduleDataFile: "schedule.json",
-    startTime: "2019-06-23T16:30:00Z",
+    startTime: "2020-01-05T16:30:00Z",
     showCurrentTime: true,
 };
 
 // This should be in reverse chronological order. Put new events at the top,
 // not the bottom.
 export const past = {
+    "sgdq-2019": {
+        name: "Summer Games Done Quick 2019",
+        color: "red",
+        scheduleDataFile: "sgdq-2019.json",
+        startTime: "2019-06-23T16:30:00Z",
+    },
     "agdq-2019": {
         name: "Awesome Games Done Quick 2019",
         color: "blue",
