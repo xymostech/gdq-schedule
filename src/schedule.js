@@ -207,14 +207,22 @@ class Run extends React.Component {
 
         const popover = (
             <div className={css(styles.popover)}>
-                <div>
-                    {info.name}
+                <div className={css(styles.popoverItem)}>
+                    <strong>{info.name}</strong>
                     {!isSetup && <span> ({info.platform})</span>}
                 </div>
-                {!isSetup && <div>Runner(s): {info.runners}</div>}
-                {!isSetup && <div>{info.runKind}</div>}
-                <div>Host: {info.host}</div>
-                <div>
+                {!isSetup &&
+                    <div className={css(styles.popoverItem)}>
+                        <strong>Runner(s):</strong> {info.runners}
+                    </div>
+                }
+                {!isSetup &&
+                    <div className={css(styles.popoverItem)}>{info.runKind}</div>
+                }
+                <div className={css(styles.popoverItem)}>
+                    <strong>Host:</strong> {info.host}
+                </div>
+                <div className={css(styles.popoverItem)}>
                     {timeFormat} ({formatDuration(info.duration)})
                 </div>
             </div>
@@ -622,6 +630,11 @@ const styles = StyleSheet.create({
         boxShadow: "1px 1px 2px #b3b3b3",
         padding: 10,
         fontSize: 15,
+    },
+
+    popoverItem: {
+        marginTop: 5,
+        marginBottom: 5,
     },
 
     eventTimes: {
