@@ -1,7 +1,6 @@
 {
   "version": 2,
   "name": "gdq-schedule",
-  "alias": "gdq-schedule.com",
   "builds": [
     {"src": "build/**", "use": "@now/static"},
     {"src": "data/**", "use": "@now/static"},
